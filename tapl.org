@@ -1,0 +1,9 @@
+* Theory and Programming Languages
+
+  This will cover the 2002 edition of the book, in PDF form.  Name the
+  book [[file:tapl.pdf][tapl.pdf]] and place it in the same directory as this file.
+  
+* [[pdfview:tapl.pdf::17][Part I]]
+** [[pdfview:tapl.pdf::17][Chapter 1: Introduction]]
+*** [[pdfview:tapl.pdf::17][1.1: Types in Computer Science]]
+    
