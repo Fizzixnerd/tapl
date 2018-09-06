@@ -1,9 +1,248 @@
-* Theory and Programming Languages
+#+STARTUP: latexpreview
+
+# run the following code to scale the previews. I don't know how to set it
+# otherwise.
+#
+# (setq org-format-latex-options (plist-put org-format-latex-options :scale 2.5))
+
+
+* Types and Programming Languages
 
   This will cover the 2002 edition of the book, in PDF form.  Name the
-  book [[file:tapl.pdf][tapl.pdf]] and place it in the same directory as this file.
-  
-* [[pdfview:tapl.pdf::17][Part I]]
-** [[pdfview:tapl.pdf::17][Chapter 1: Introduction]]
-*** [[pdfview:tapl.pdf::17][1.1: Types in Computer Science]]
+  book [[file:tapl_book.pdf][tapl_book.pdf]] and place it in the same directory as this file.
+
+
+* [[pdfview:tapl_book.pdf::23][Part 0: Preliminaries]]
+** [[pdfview:tapl_book.pdf::23][Chapter 1: Introduction]]
+*** [[pdfview:tapl_book.pdf::23][1.1: Types in Computer Science]]
+
+    Type systems in CS are used primarily to prevent semantically
+    invalid programs from being run, implemented at the syntax level.
+
+    [[pdfview:tapl_book.pdf::23][Plausible definition:]] A /type system/ is a tractable syntactic
+    method for proving the absence of certain program behaviors by
+    classifying phrases according to the kinds of values they compute.
+
+    Can be thought of as a static approximation of runtime behavior
+    (via a /quotient/) meant to catch error.
+
+    We do not consider /dynamic typing/ to be a type system for the
+    purposes of this book.
+
+    Type systems are /conservative/ in the sense they may not allow
+    completely valid programs to be run.  They are able only to prove
+    the /absence/ of errors, not prove their /presence/.  [[pdfview:tapl_book.pdf::25][An example]]
+    is:
+
+    #+BEGIN_SRC c
+      int main(void){
+        if (complex || test) {
+          return do_the_thing();
+        } else {
+          return type_error();
+        }
+      }
+    #+END_SRC
+
+    It may be that it can be statically proven that the complex test
+    always evaluated to =true=, but the typechecker for most
+    languages will not allow this program through.  Thus we may have
+    correct programs that nonetheless are deemed incorrect by the
+    typechecker.
     
+*** [[pdfview:tapl_book.pdf::26][1.2: What Type Systems Are Good For]]
+**** Detection of Errors
+
+    Type systems allow early /detection of errors/.  Note that only
+    certain classes of errors are caught by typecheckers: the
+    implementation of many numerical calculations is basically unaided
+    by a type system, because everything is a *Float* or whatever.
+    The larger the variety of data structures -- both abstract (in the
+    sense that a *Name* might be isomorphic to a *String*, but not
+    equal) and concrete (in the sense of *Lists* and *RedBlackTrees*
+    in your application implementation) -- the more good the type
+    system /can/ do for you.
+
+    Note that the programmer has to be willing to actually /use/ the
+    features offered.  If the programmer implements everything as
+    =arrays= in C with no abstract =struct= definitions, then even C's
+    already weak type system is rendered /completely/ useless.
+
+    In this regard the typechecker is both useful when /writing/ the
+    program, and when /maintaining/ it.  If you modify a complex
+    type's definition in a non-backwards compatible way, then the type
+    checker will simply point out all the sites that are broken by
+    this change, allowing the programmer to feel safe about
+    refactoring and adding features.
+
+**** Abstraction
+
+     Type systems can allow the definition and implementation of
+     sophisticated /module systems/ for programming languages.  These
+     module systems are used to construct the interfaces between
+     pieces of a program and -- with the help of a good typechecker
+     -- allow these interfaces to be rigorously defined and strictly
+     enforced.
+
+**** Documentation
+
+     Types are often a wonderful form of /compiler checked/
+     documentation.  They are never out of date with the code and give
+     strict bounds on what you can (and /cannot/) do with a particular
+     thing (function, object, etc).
+
+**** Language Safety
+
+     A safe language protects its own abstractions.  If it gives you
+     *Arrays*, you cannot happily write off the end of them (runtime
+     safety).  If it gives you an *Int*, you cannot just cast it to a
+     *Pointer* and start reading from and writing to memory with it.
+
+     Type safety, as indicated above, is not the only type of safety
+     offered by safe languages.  Runtime checks are also important, in
+     order to /trap/ errors as they occur and allow them to be dealt
+     with cleanly with an exception or other mechanism.
+
+     Some languages which are safe offer an /unsafe sublanguage/ for
+     writing low-level (or sometimes performance-critical) code.
+     Examples include NJSML, Modula-3, C#, and Haskell.
+
+**** Efficiency
+
+     Typecheckers are regularly used in program optimization.  In
+     fact, this was their /first/ use, in languages such as FORTRAN.
+     Language designers wanted to be able to use more efficient *Int*
+     instructions rather than always using *Float* ones.
+
+**** [[pdfview:tapl_book.pdf::30][Further Applications]]
+
+     See book for details, some neat stuff here.
+
+*** [[pdfview:tapl_book.pdf::31][1.3: Type Systems and Language Design]]
+
+    Basically, you have to design a language around a type system, not
+    the other way around.
+
+*** [[pdfview:tapl_book::32][1.4: Capsule History]]
+
+    A list of important discoveries.
+
+*** [[pdfview:tapl_book.pdf::34][1.5: Related Reading]]
+
+    A bunch of references for specific special topics.
+
+** [[pdfview:tapl_book.pdf::37][Chapter 2: Mathematical Preliminaries]]
+
+   Because I already know much of this information, I'm just going to
+   skim over this, as suggested at the head of the Chapter.
+
+*** 2.2: Ordered Sets
+
+**** Exercise 2.2.6
+    Clearly $R'$ is reflexive. Let $A = \{(s, s) : s \in S\}$ and let $T$ be
+    another reflexive set containing $R$. If $x \in R'$, then $x \in R$ -- in
+    which case $x \in T$ by definition -- or $x \in A$. Assume then that $x \in
+    A$ and $x \notin T$. Then $T$ is not reflexive (by the definition of
+    elements of $A$) a contradiction. Therefore $R' \subset T$, and we are done.
+
+**** Exercise 2.2.7
+    Let $x, y, z \in S$, with $x R^+ y$ and $y R^+ z$. If $x R z$, then we are
+    done, so suppose not. Then there exist $i, j > 0$ such that $x R_i y$ and $y
+    R_j z$. Let $n = max(i, j)$, and consider $R_{n+1}$. Both $R_i \subset
+    R_{n+1}$ and $R_j \subset R_{n+1}$. Then $x R_{n+1} z$ by definition, and so
+    $R^+$ is transitive. All that is left to prove is that it is the smallest
+    transitive relation containing $R$. Let $T$ be another transitive relation
+    containing $R$; we proceed by induction. First note that $R_0 \subset T$.
+    Suppose $R_{i-1} \subset T$. Then, since $T$ is transitive, if $x R_{i-1} y$
+    and $y R_{i-1} z$ then both $x R_i z$ and $x T z$, so that $R_i \subset T$.
+    By the principle of induction then $R_i \subset T$ for each $i$ and we are
+    done.
+
+**** Exercise 2.2.8
+    First note that if $T$ is reflexive then so is $T^+$: if $x \in S$ then $x T
+    x$ and so $x T^+ x$ since $T \subset T^+$. Then (in the notation of the
+    previous exercises) we have $R^* = R'^+$. Then $x R^* y$ means that $x R'_i
+    y$ for some $i \in \mathbb{N}$, where $R'_i$ is defined as in Exercise
+    2.2.7. We then proceed by induction: by definition, $P(x)$ and $x R' y$
+    means that $P(y)$. Then suppose $R_{i-1}$ preserves $P$, and let $x R'_i y$.
+    Then there exists $z$ such that $x R'_{i-1} z$ and $z R'_{i-1} y$. Since
+    $R'_{i-1}$ preserves P, it must be that $P(x) \implies P(z) \implies P(y)$.
+    By the principle of induction, $R'_i$ preserves $P$ for each $i$ and we are
+    done.
+
+* [[pdfview:tapl_book.pdf::43][Part 1: Untyped Systems]]
+** [[pdfview:tapl_book.pdf::45][Chapter 3: Untyped Arithmetic Expressions]]
+
+   We are going to develop the tools to tackle the syntax and
+   semantics of programs, starting with a small /untyped/ language
+   containing only *booleans* and *numbers*.  We will call this
+   language, and the interpreter that runs it, =arith=.
+
+*** [[pdfview:tapl_book.pdf::45][3.1: Introduction]]
+
+    We begin with a simple language, with the following definition of
+    a /term/ =t=:
+
+    #+BEGIN_SRC bnf
+    t ::= true
+        | false
+	      | 0
+	      | if t then t else t
+	      | succ t
+	      | pred t
+	      | iszero t
+    #+END_SRC
+    
+    Now, =t= is not a variable of =arith= -- the /object language/ --
+    but a /metavariable/ of the grammar -- the /metalanguage/.  The
+    field of math that deals with these concepts is called
+    /metamathematics/, where we study /metatheories/.  For example,
+    the "metatheory of subtyping" is "the formal study of the
+    properties of systems with subtyping".
+
+    In this simple language, a /term/ and an /expression/ are
+    interchangeable, but this will not be the case when we later
+    introduce types.
+
+    Here are some simple computations (i.e., programs) in =arith= and
+    what they would return.
+
+    #+BEGIN_SRC arith
+    if false then 0 else 1;
+    > 1
+    #+END_SRC
+
+    #+BEGIN_SRC arith
+    iszero (pred (succ 0));
+    > true
+    #+END_SRC
+    
+**** Writing =arith=: An Exercise in Template Haskell.
+
+     We take this opportunity to learn more about Template Haskell and
+     the implementation of EDSLs via QuasiQuoters.  We use [[http://downloads.haskell.org/~ghc/latest/docs/html/users_guide/glasgow_exts.html#template-haskell-quasi-quotation][this]] as our
+     reference.
+
+     Note: We ended up abandoning this, and will focus more on the exercises
+     from here on out.
+
+*** 3.2: Syntax
+
+**** Exercise 3.2.4
+     Let $x = |S_{i-1}|$. Then $|S_{i}| = 3 + 3x + x^3$. $|S_0| = 0$, and so:
+     $|S_1| = 3$, $|S_2| = 39$, $|S_3| = 59439$.
+
+**** Exercise 3.2.5
+     Clearly $S_0 \subset S_k$. Suppose then that $S_{i-1} \subset S_i$ for each
+     $i < n - 1$. We show $S_{n-1} \subset S_n$. Let $t \in S_{n-1}$. There are
+     three cases:
+
+     \begin{itemize}
+     \item $t \in \{true, false, 0\}$, in which case $t \in S_n$.
+     \item $t = f s$ where $f \in \{succ, pred, iszero\}$ and $s \in S_{n-2}
+           \subset S_{n-1}$.  Then by definition, $t \in S_n$.
+     \item $t =$ if $r$ then $s$ else $u$, where $r, s, u \in S_{n-2} \subset S_{n-1}$.
+           Then again by definition, $t \in S_n$.
+     \end{itemize}
+
+     This completes the proof.
